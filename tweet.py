@@ -60,7 +60,7 @@ img = Image.open(BytesIO(br.get_screenshot_as_png()))
 chart = br.find_element_by_css_selector('svg')
 x, y = chart.location['x'], chart.location['y']
 h, w = chart.size['height'], chart.size['width']
-crop = img.crop((x, y, x + w, y + h))
+crop = img.crop((x + 100, y + 50, x + w - 100, y + h - 50))
 crop.save('/tmp/knpr_box_office_daily_chart.png')
 
 # tweet the chart image
