@@ -78,7 +78,6 @@ https://skrm.ch/prettyrhythm/kinpri-box-office/
     show=data['show'],
     sell=data['sell'],
 )
-print(len(status))
 api.update_with_media('/tmp/knpr_box_office_daily_chart.png',
                       status=status)
 
