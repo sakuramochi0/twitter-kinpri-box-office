@@ -9,6 +9,7 @@ from PIL import Image
 import requests
 from selenium.webdriver import PhantomJS
 from selenium.webdriver.common.action_chains import ActionChains
+import time
 import tweepy
 
 
@@ -42,6 +43,7 @@ url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/'
 br = PhantomJS()
 br.maximize_window()
 br.get(url)
+time.sleep(3)
 
 # move to the chart location
 h3 = br.find_elements_by_css_selector('h3')[1]
@@ -54,6 +56,7 @@ css = ('#daily > div > div:nth-child(1) > div > svg > '
        'g:nth-child(4) > g:nth-child(2) > g:nth-child(2) > rect')
 bar = br.find_elements_by_css_selector(css)[-2]
 bar.click()
+time.sleep(1)
 
 # crop & save the chart area of the screenshot image
 img = Image.open(BytesIO(br.get_screenshot_as_png()))
@@ -68,8 +71,8 @@ data = get_latest_data()
 yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
 status = '''『KING OF PRISM -PRIDE the HERO-』
 {date}の結果は、
-上映回数が {show} 回
-座席販売数が {sell} 席でした！
+上映回数 {show} 回
+座席販売数 {sell} 席でした！
 
 📈 キンプラ 座席販売数グラフ 📊
 https://skrm.ch/prettyrhythm/kinpri-box-office/
