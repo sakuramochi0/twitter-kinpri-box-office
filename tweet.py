@@ -67,9 +67,9 @@ crop.save('/tmp/knpr_box_office_daily_chart.png')
 data = get_latest_data()
 yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
 status = '''『KING OF PRISM -PRIDE the HERO-』
-{d.month}月{d.day}日({wday})の結果です！
-上映回数は{show}回
-座席販売数は{sell}席でした！
+{date}の結果は、
+上映回数が {show} 回
+座席販売数が {sell} 席でした！
 
 📈 キンプラ 座席販売数グラフ 📊
 https://skrm.ch/prettyrhythm/kinpri-box-office/
