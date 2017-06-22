@@ -20,11 +20,15 @@ def get_weekday(day):
 def get_latest_data():
     url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/api/v1/mimorin/daily.json'
     r = requests.get(url)
-    data = json.loads(r.text)[-2]
+    j = json.loads(r.text)
+    latest = j[-2]
+    previous = j[-3]
+    diff = latest[1] - previous[1]
     return {
-        'date': data[0],
-        'sell': data[1],
-        'show': data[2],
+        'date': latest[0],
+        'sell': latest[1],
+        'show': latest[2],
+        'diff': diff,
     }
 
 # prepare the args
@@ -69,17 +73,18 @@ crop.save('/tmp/knpr_box_office_daily_chart.png')
 # tweet the chart image
 data = get_latest_data()
 yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-status = '''『KING OF PRISM -PRIDE the HERO-』
+status = '''KING OF PRISM -PRIDE the HERO-
 {date}の結果は、
-上映回数 {show} 回
-座席販売数 {sell} 席でした！
+上映回数{show}回
+販売座席数{sell}席(前日{diff:+d})でした！
 
-📈 キンプラ 座席販売数グラフ 📊
+📈キンプラ 販売座席数グラフ📊
 https://skrm.ch/prettyrhythm/kinpri-box-office/
 #prettyrhythm #kinpri'''.format(
     date=data['date'],
     show=data['show'],
     sell=data['sell'],
+    diff=data['diff'],
 )
 api.update_with_media('/tmp/knpr_box_office_daily_chart.png',
                       status=status)
