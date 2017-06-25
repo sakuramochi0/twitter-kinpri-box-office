@@ -56,7 +56,7 @@ h3 = br.find_elements_by_css_selector('h3')[0]
 ActionChains(br).move_to_element(h3).perform()
 
 # hover on the latest day's bar
-css = ('#daily > div > div:nth-child(1) > div > svg > '
+css = ('#daily-chart > div > div:nth-child(1) > div > svg > '
        'g:nth-child(4) > g:nth-child(2) > g:nth-child(2) > rect')
 bar = br.find_elements_by_css_selector(css)[-2]
 bar.click()
