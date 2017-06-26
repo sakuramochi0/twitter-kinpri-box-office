@@ -22,13 +22,20 @@ def get_latest_data():
     r = requests.get(url)
     j = json.loads(r.text)
     latest = j[-2]
-    previous = j[-3]
-    diff = latest[1] - previous[1]
+    previous_day = j[-3]
+    last_week = j[-9]
+    daily_show_diff = latest[2] - previous_day[2]
+    daily_sell_diff = latest[1] - previous_day[1]
+    weekly_show_diff = latest[2] - last_week[2]
+    weekly_sell_diff = latest[1] - last_week[1]
     return {
         'date': latest[0],
         'sell': latest[1],
         'show': latest[2],
-        'diff': diff,
+        'daily_show_diff': daily_show_diff,
+        'daily_sell_diff': daily_sell_diff,
+        'weekly_show_diff': weekly_show_diff,
+        'weekly_sell_diff': weekly_sell_diff,
     }
 
 # prepare the args
@@ -73,18 +80,20 @@ crop.save('/tmp/knpr_box_office_daily_chart.png')
 # tweet the chart image
 data = get_latest_data()
 yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-status = '''KING OF PRISM -PRIDE the HERO-
-{date}の結果は、
-上映回数{show}回
-販売座席数{sell}席(前日{diff:+d})でした！
+status = '''{date}の結果は、
+上映回数 {show} 回 (先週 {weekly_show_diff:+d} 回)
+販売座席数 {sell} 席 (先週 {weekly_sell_diff:+d} 席)
+でした！ #kinpri #prettyrhythm
 
 📈キンプラ 販売座席数グラフ📊
-https://skrm.ch/prettyrhythm/kinpri-box-office/
-#prettyrhythm #kinpri'''.format(
+https://skrm.ch/prettyrhythm/kinpri-box-office/'''.format(
     date=data['date'],
     show=data['show'],
     sell=data['sell'],
-    diff=data['diff'],
+    daily_show_diff=data['daily_show_diff'],
+    daily_sell_diff=data['daily_sell_diff'],
+    weekly_show_diff=data['weekly_show_diff'],
+    weekly_sell_diff=data['weekly_sell_diff'],
 )
 api.update_with_media('/tmp/knpr_box_office_daily_chart.png',
                       status=status)
