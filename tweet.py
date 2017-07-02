@@ -21,9 +21,9 @@ def get_latest_data():
     url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/api/v1/mimorin/daily.json'
     r = requests.get(url)
     j = json.loads(r.text)
-    latest = j[-2]
-    previous_day = j[-3]
-    last_week = j[-9]
+    latest = j[-3]
+    previous_day = j[-4]
+    last_week = j[-10]
     daily_show_diff = latest[2] - previous_day[2]
     daily_sell_diff = latest[1] - previous_day[1]
     weekly_show_diff = latest[2] - last_week[2]
@@ -69,9 +69,9 @@ ActionChains(br).move_to_element(h3).perform()
 # hover on the latest day's bar
 css = ('#daily-chart > div > div:nth-child(1) > div > svg > '
        'g:nth-child(4) > g:nth-child(2) > g:nth-child(2) > rect')
-bar = br.find_elements_by_css_selector(css)[-2]
-bar.click()
-time.sleep(1)
+bar = br.find_elements_by_css_selector(css)[-3]
+#bar.click()
+#time.sleep(1)
 
 # crop & save the chart area of the screenshot image
 img = Image.open(BytesIO(br.get_screenshot_as_png()))
