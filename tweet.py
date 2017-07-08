@@ -42,49 +42,40 @@ def get_latest_data():
         'weekly_sell_percent': weekly_sell_percent,
     }
 
-# prepare the args
-parser = argparse.ArgumentParser()
-parser.add_argument('-d', '--debug', action='store_true')
-args = parser.parse_args()
 
-# get tweepy api
-if args.debug:
-    api = get_api('sakuramochi_pre')
-else:
-    api = get_api('knpr_box_office')
-    
-# go to the site
-url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/'
-br = PhantomJS()
-br.maximize_window()
-br.get(url)
-time.sleep(3)
+def kinpri2_daily():
+    # go to the site
+    url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/'
+    br = PhantomJS()
+    br.maximize_window()
+    br.get(url)
+    time.sleep(3)
 
-# move to the chart location
-h3 = br.find_elements_by_css_selector('h3')[1]
-ActionChains(br).move_to_element(h3).perform()
-h3 = br.find_elements_by_css_selector('h3')[0]
-ActionChains(br).move_to_element(h3).perform()
+    # move to the chart location
+    h3 = br.find_elements_by_css_selector('h3')[1]
+    ActionChains(br).move_to_element(h3).perform()
+    h3 = br.find_elements_by_css_selector('h3')[0]
+    ActionChains(br).move_to_element(h3).perform()
 
-# hover on the latest day's bar
-css = ('#daily-chart > div > div:nth-child(1) > div > svg > '
-       'g:nth-child(4) > g:nth-child(2) > g:nth-child(2) > rect')
-bar = br.find_elements_by_css_selector(css)[-3]
-#bar.click()
-#time.sleep(1)
+    # hover on the latest day's bar
+    # css = ('#daily-chart > div > div:nth-child(1) > div > svg > '
+    #        'g:nth-child(4) > g:nth-child(2) > g:nth-child(2) > rect')
+    # bar = br.find_elements_by_css_selector(css)[-3]
+    # bar.click()
+    # time.sleep(1)
 
-# crop & save the chart area of the screenshot image
-img = Image.open(BytesIO(br.get_screenshot_as_png()))
-chart = br.find_element_by_css_selector('svg')
-x, y = chart.location['x'], chart.location['y']
-h, w = chart.size['height'], chart.size['width']
-crop = img.crop((x + 100, y + 50, x + w - 100, y + h - 50))
-crop.save('/tmp/knpr_box_office_daily_chart.png')
+    # crop & save the chart area of the screenshot image
+    img = Image.open(BytesIO(br.get_screenshot_as_png()))
+    chart = br.find_elements_by_css_selector('svg')[0]
+    x, y = chart.location['x'], chart.location['y']
+    h, w = chart.size['height'], chart.size['width']
+    crop = img.crop((x + 100, y + 50, x + w - 100, y + h - 50))
+    crop.save('/tmp/knpr_box_office_chart.png')
 
-# tweet the chart image
-data = get_latest_data()
-yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-status = '''{date}の結果は、
+    # tweet the chart image
+    data = get_latest_data()
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    status = '''{date}の結果は、
 上映回数 {show} 回 (先週{weekly_show_diff:+d}回 / {weekly_show_percent}%)
 販売座席数 {sell} 席 (先週{weekly_sell_diff:+d}席 / {weekly_sell_percent}%)
 でした！ #kinpri #prettyrhythm
@@ -101,7 +92,85 @@ https://skrm.ch/prettyrhythm/kinpri-box-office/'''.format(
     weekly_show_percent=data['weekly_show_percent'],
     weekly_sell_percent=data['weekly_sell_percent'],
 )
-api.update_with_media('/tmp/knpr_box_office_daily_chart.png',
-                      status=status)
+    api.update_with_media('/tmp/knpr_box_office_chart.png',
+                          status=status)
 
-br.quit()
+    br.quit()
+
+
+def kinpri2_weekly():
+    # go to the site
+    url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/'
+    br = PhantomJS()
+    br.maximize_window()
+    br.get(url)
+    time.sleep(3)
+
+    # move to the chart location
+    h3 = br.find_elements_by_css_selector('h3')[3]
+    ActionChains(br).move_to_element(h3).perform()
+    h3 = br.find_elements_by_css_selector('h3')[1]
+    ActionChains(br).move_to_element(h3).perform()
+
+    # hover on the latest day's bar
+    # css = ('#daily-chart > div > div:nth-child(1) > div > svg > '
+    #        'g:nth-child(4) > g:nth-child(2) > g:nth-child(2) > rect')
+    # bar = br.find_elements_by_css_selector(css)[-3]
+    # bar.click()
+    # time.sleep(1)
+
+    # crop & save the chart area of the screenshot image
+    img = Image.open(BytesIO(br.get_screenshot_as_png()))
+    chart = br.find_elements_by_css_selector('svg')[1]
+    x, y = chart.location['x'], chart.location['y']
+    h, w = chart.size['height'], chart.size['width']
+    crop = img.crop((x + 100, y + 50, x + w - 100, y + h - 50))
+    crop.save('/tmp/knpr_box_office_chart.png')
+
+    # tweet the chart image
+    data = get_latest_data()
+    yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
+    status = '''{date}の結果は、
+上映回数 {show} 回 (先週{weekly_show_diff:+d}回 / {weekly_show_percent}%)
+販売座席数 {sell} 席 (先週{weekly_sell_diff:+d}席 / {weekly_sell_percent}%)
+でした！ #kinpri #prettyrhythm
+
+📈キンプラ 販売座席数グラフ📊
+https://skrm.ch/prettyrhythm/kinpri-box-office/'''.format(
+    date=data['date'],
+    show=data['show'],
+    sell=data['sell'],
+    daily_show_diff=data['daily_show_diff'],
+    daily_sell_diff=data['daily_sell_diff'],
+    weekly_show_diff=data['weekly_show_diff'],
+    weekly_sell_diff=data['weekly_sell_diff'],
+    weekly_show_percent=data['weekly_show_percent'],
+    weekly_sell_percent=data['weekly_sell_percent'],
+)
+    api.update_with_media('/tmp/knpr_box_office_chart.png',
+                          status=status)
+
+    br.quit()
+
+
+if __name__ == '__main__':
+    # prepare the args
+    parser = argparse.ArgumentParser()
+    parser.add_argument('type')
+    parser.add_argument('-d', '--debug', action='store_true')
+    args = parser.parse_args()
+
+    # get tweepy api
+    if args.debug:
+        api = get_api('sakuramochi_pre')
+    else:
+        api = get_api('knpr_box_office')
+
+    # tweet according to the type
+    if args.type == 'kinpri2_daily':
+        kinpri2_daily()
+    elif args.type == 'kinpri2_weekly':
+        kinpri2_weekly()
+    else:
+        raise ArgumentError('invalid argument')
+    
