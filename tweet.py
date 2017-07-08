@@ -28,8 +28,8 @@ def get_latest_data_daily():
     daily_sell_diff = latest[1] - previous_day[1]
     weekly_show_diff = latest[2] - last_week[2]
     weekly_sell_diff = latest[1] - last_week[1]
-    weekly_show_percent = int((latest[2] / last_week[2]) * 100)
-    weekly_sell_percent = int((latest[1] / last_week[1]) * 100)
+    weekly_show_percent = round((latest[2] / last_week[2]) * 100)
+    weekly_sell_percent = round((latest[1] / last_week[1]) * 100)
     return {
         'date': latest[0],
         'sell': latest[1],
@@ -51,8 +51,8 @@ def get_latest_data_weekly():
     previous = j[-4]
     show_diff = latest[2] - previous[2]
     sell_diff = latest[1] - previous[1]
-    show_percent = int((latest[2] / previous[2]) * 100)
-    sell_percent = int((latest[1] / previous[1]) * 100)
+    show_percent = round((latest[2] / previous[2]) * 100)
+    sell_percent = round((latest[1] / previous[1]) * 100)
     return {
         'date': latest[0],
         'sell': latest[1],
