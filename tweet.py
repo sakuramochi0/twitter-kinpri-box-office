@@ -17,7 +17,7 @@ def get_weekday(day):
     return '月火水木金土日'[day.weekday()]
 
 
-def get_latest_data():
+def get_latest_data_daily():
     url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/api/v1/mimorin/daily.json'
     r = requests.get(url)
     j = json.loads(r.text)
@@ -40,6 +40,27 @@ def get_latest_data():
         'weekly_sell_diff': weekly_sell_diff,
         'weekly_show_percent': weekly_show_percent,
         'weekly_sell_percent': weekly_sell_percent,
+    }
+
+
+def get_latest_data_weekly():
+    url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/api/v1/mimorin/weekly.json'
+    r = requests.get(url)
+    j = json.loads(r.text)
+    latest = j[-3]
+    previous = j[-4]
+    show_diff = latest[2] - previous[2]
+    sell_diff = latest[1] - previous[1]
+    show_percent = int((latest[2] / previous[2]) * 100)
+    sell_percent = int((latest[1] / previous[1]) * 100)
+    return {
+        'date': latest[0],
+        'sell': latest[1],
+        'show': latest[2],
+        'show_diff': show_diff,
+        'sell_diff': sell_diff,
+        'show_percent': show_percent,
+        'sell_percent': sell_percent,
     }
 
 
@@ -73,11 +94,11 @@ def kinpri2_daily():
     crop.save('/tmp/knpr_box_office_chart.png')
 
     # tweet the chart image
-    data = get_latest_data()
+    data = get_latest_data_daily()
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-    status = '''{date}の結果は、
-上映回数 {show} 回 (先週{weekly_show_diff:+d}回 / {weekly_show_percent}%)
-販売座席数 {sell} 席 (先週{weekly_sell_diff:+d}席 / {weekly_sell_percent}%)
+    status = '''{date}の結果は
+上映回数 {show} 回 (先週比{weekly_show_percent}% / {weekly_show_diff:+d}回)
+販売座席数 {sell} 席 (先週比{weekly_sell_percent}% / {weekly_sell_diff:+d}席)
 でした！ #kinpri #prettyrhythm
 
 📈キンプラ 販売座席数グラフ📊
@@ -128,11 +149,11 @@ def kinpri2_weekly():
     crop.save('/tmp/knpr_box_office_chart.png')
 
     # tweet the chart image
-    data = get_latest_data()
+    data = get_latest_data_weekly()
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-    status = '''{date}の結果は、
-上映回数 {show} 回 (先週{weekly_show_diff:+d}回 / {weekly_show_percent}%)
-販売座席数 {sell} 席 (先週{weekly_sell_diff:+d}席 / {weekly_sell_percent}%)
+    status = '''{date}の結果は
+上映回数 {show} 回(先週比{show_percent}%/{show_diff:+d}回)
+販売座席数 {sell} 席(先週比{sell_percent}%/{sell_diff:+d}席)
 でした！ #kinpri #prettyrhythm
 
 📈キンプラ 販売座席数グラフ📊
@@ -140,12 +161,10 @@ https://skrm.ch/prettyrhythm/kinpri-box-office/'''.format(
     date=data['date'],
     show=data['show'],
     sell=data['sell'],
-    daily_show_diff=data['daily_show_diff'],
-    daily_sell_diff=data['daily_sell_diff'],
-    weekly_show_diff=data['weekly_show_diff'],
-    weekly_sell_diff=data['weekly_sell_diff'],
-    weekly_show_percent=data['weekly_show_percent'],
-    weekly_sell_percent=data['weekly_sell_percent'],
+    show_diff=data['show_diff'],
+    sell_diff=data['sell_diff'],
+    show_percent=data['show_percent'],
+    sell_percent=data['sell_percent'],
 )
     api.update_with_media('/tmp/knpr_box_office_chart.png',
                           status=status)
