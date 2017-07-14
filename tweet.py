@@ -47,14 +47,14 @@ def get_latest_data_weekly():
     url = 'https://skrm.ch/prettyrhythm/kinpri-box-office/api/v1/mimorin/weekly.json'
     r = requests.get(url)
     j = json.loads(r.text)
-    latest = j[-3]
-    previous = j[-4]
+    latest = j[-2]
+    previous = j[-3]
     show_diff = latest[2] - previous[2]
     sell_diff = latest[1] - previous[1]
     show_percent = round((latest[2] / previous[2]) * 100)
     sell_percent = round((latest[1] / previous[1]) * 100)
     return {
-        'date': latest[0],
+        'date': latest[0].replace('\n', ''),
         'sell': latest[1],
         'show': latest[2],
         'show_diff': show_diff,
@@ -151,7 +151,7 @@ def kinpri2_weekly():
     # tweet the chart image
     data = get_latest_data_weekly()
     yesterday = datetime.datetime.today() - datetime.timedelta(days=1)
-    status = '''{date}の結果は
+    status = '''{date}の結果は、
 上映回数 {show} 回(先週比{show_percent}%/{show_diff:+d}回)
 販売座席数 {sell} 席(先週比{sell_percent}%/{sell_diff:+d}席)
 でした！ #kinpri #prettyrhythm
