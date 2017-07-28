@@ -70,7 +70,7 @@ def kinpri2_daily():
     br = PhantomJS()
     br.maximize_window()
     br.get(url)
-    time.sleep(3)
+    time.sleep(10)
 
     # move to the chart location
     h3 = br.find_elements_by_css_selector('h3')[1]
@@ -125,7 +125,7 @@ def kinpri2_weekly():
     br = PhantomJS()
     br.maximize_window()
     br.get(url)
-    time.sleep(3)
+    time.sleep(10)
 
     # move to the chart location
     h3 = br.find_elements_by_css_selector('h3')[3]
