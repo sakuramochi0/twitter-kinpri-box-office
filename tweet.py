@@ -33,11 +33,11 @@ def get_latest_data_daily():
     if last_week[2] != 0:
         weekly_show_percent = round((latest[2] / last_week[2]) * 100)
     else:
-        weekly_show_percent = '∞'
+        weekly_show_percent = '？'
     if last_week[1] != 0:
         weekly_sell_percent = round((latest[1] / last_week[1]) * 100)
     else:
-        weekly_sell_percent = '∞'
+        weekly_sell_percent = '？'
 
     return {
         'date': latest[0],
@@ -65,11 +65,11 @@ def get_latest_data_weekly():
     if previous[2] != 0:
         show_percent = round((latest[2] / previous[2]) * 100)
     else:
-        show_percent = '∞'
+        show_percent = '？'
     if previous[1] != 0:
         sell_percent = round((latest[1] / previous[1]) * 100)
     else:
-        sell_percent = '∞'
+        sell_percent = '？'
 
     return {
         'date': latest[0].replace('\n', ''),
